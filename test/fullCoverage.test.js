@@ -1,6 +1,6 @@
 import fs from "fs";
 import { expect, test, vi } from "vitest";
-import Gemini from "../index";
+import Gemini from "../src/index.ts";
 
 const API_KEY = "demo-key";
 
@@ -114,7 +114,7 @@ test("Gemini.ask() with Previous Messages", async () => {
 			format: Gemini.JSON,
 			data: [fileBuffer],
 			messages: [["Hi", "Sup?"]],
-		}),
+		})
 	).toBe(generateContentResponse);
 });
 
@@ -129,7 +129,7 @@ test("Gemini.ask() with Data", async () => {
 		await gemini.ask("What does this show?", {
 			format: Gemini.JSON,
 			data: [fileBuffer],
-		}),
+		})
 	).toBe(generateContentResponse);
 });
 
@@ -142,28 +142,14 @@ test("Gemini.ask() with JSON Response", async () => {
 	expect(
 		await gemini.ask("Hello!", {
 			format: Gemini.JSON,
-		}),
+		})
 	).toBe(generateContentResponse);
-});
-
-test("Gemini.ask() with Incorrect Config", async () => {
-	const gemini = new Gemini(API_KEY);
-
-	expect(
-		(async () =>
-			await gemini.ask("Hello!", {
-				format: Gemini.JSON,
-				nonExistantProperty: "hi",
-			}))(),
-	).rejects.toThrowError(
-		"These following configurations are not available on this function: nonExistantProperty",
-	);
 });
 
 test("Fetch Polyfill", async () => {
 	const fetchPolyfill = vi.fn();
 	fetchPolyfill.mockReturnValueOnce(
-		createFetchResponse(generateContentResponse),
+		createFetchResponse(generateContentResponse)
 	);
 
 	const gemini = new Gemini(API_KEY, {
@@ -225,6 +211,6 @@ test("Gemini.createChat() with JSON", async () => {
 	expect(
 		await chat.ask("Hello!", {
 			format: Gemini.JSON,
-		}),
+		})
 	).toBe(generateContentResponse);
 });

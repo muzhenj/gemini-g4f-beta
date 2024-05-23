@@ -1,9 +1,4 @@
-<picture>
-
-  <source media="(prefers-color-scheme: dark)" srcset="../assets/banner@dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="../assets/banner@light.svg">
-  <img alt="Gemini AI Banner" src="../assets/banner@light.svg">
-</picture>
+<img alt="Gemini AI Banner" src="../assets/banner.png">
 <p align="center">
   <a aria-label="NPM Version" href="https://www.npmjs.com/package/gemini-ai">
     <img alt="" src="https://img.shields.io/npm/v/gemini-ai.svg?label=NPM&logo=npm&style=for-the-badge&color=0470FF&logoColor=white">
@@ -194,12 +189,12 @@ npm i undici
 Initialize it with Gemini AI:
 
 ```javascript
-import { ProxyAgent } from 'undici'
-import Gemini from 'gemini-ai'
+import { ProxyAgent } from "undici";
+import Gemini from "gemini-ai";
 
 let gemini = new Gemini(API_KEY, {
-	dispatcher: new ProxyAgent(PROXY_URL)
-})
+	dispatcher: new ProxyAgent(PROXY_URL),
+});
 ```
 
 And use as normal!

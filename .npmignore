@@ -3,3 +3,7 @@
 /.github
 /test
 /bun.lockb
+/src
+tsconfig.json
+tsup.config.ts
+biome.json

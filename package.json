@@ -1,16 +1,16 @@
 {
 	"name": "gemini-ai",
-	"version": "1.1.0",
+	"version": "2.0.0",
 	"author": "EvanZhouDev",
-	"main": "index.js",
 	"description": "The easiest way to use the powerful Google Gemini model.",
 	"license": "GPL-3.0",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/EvanZhouDev/gemini-ai.git"
+		"url": "git+https://github.com/EvanZhouDev/gemini-ai.git"
 	},
 	"homepage": "https://github.com/EvanZhouDev/gemini-ai",
 	"scripts": {
+		"build": "tsup",
 		"test": "vitest",
 		"coverage": "vitest --coverage",
 		"check": "bunx @biomejs/biome check --apply ."
@@ -23,10 +23,13 @@
 	"devDependencies": {
 		"@biomejs/biome": "1.4.1",
 		"@vitest/coverage-v8": "^1.0.4",
+		"tsup": "^8.0.2",
 		"vitest": "^1.0.4"
 	},
 	"dependencies": {
 		"file-type": "^19.0.0",
 		"undici": "^6.18.1"
-	}
+	},
+	"main": "dist/index.mjs",
+	"typings": "dist/index.d.mts"
 }

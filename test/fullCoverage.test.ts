@@ -1,14 +1,15 @@
-import fs from "fs";
-import { expect, test, vi } from "vitest";
+import { expect, vi, test } from "vitest";
+import type { Mock } from "vitest";
 import Gemini from "../src/index.ts";
+import { Command, QueryResponseMap } from "../src/types.ts";
+import * as fs from "fs";
 
 const API_KEY = "demo-key";
 
-function createFetchResponse(data) {
-	return Promise.resolve({ ok: true, status: 200, json: () => data });
-}
+const createFetchResponse = <T>(data: T) =>
+	Promise.resolve({ ok: true, status: 200, json: () => data });
 
-const generateContentResponse = {
+const generateContentResponse: QueryResponseMap[Command.Generate] = {
 	candidates: [
 		{
 			content: {
@@ -63,7 +64,7 @@ const generateContentResponse = {
 	},
 };
 
-const embedResponse = {
+const embedResponse: QueryResponseMap[Command.Embed] = {
 	embedding: {
 		values: [
 			0.014044438, -0.011704044, -0.018803535, -0.048892725, 0.022579819,
@@ -90,21 +91,25 @@ const embedResponse = {
 	},
 };
 
-const countResponse = {
+const countResponse: QueryResponseMap[Command.Count] = {
 	totalTokens: 2,
 };
 
 test("Gemini.ask()", async () => {
-	global.fetch = vi.fn();
-	fetch.mockReturnValueOnce(createFetchResponse(generateContentResponse));
+	global.fetch = vi.fn() as Mock;
+	(fetch as Mock).mockReturnValueOnce(
+		createFetchResponse(generateContentResponse)
+	);
 
 	const gemini = new Gemini(API_KEY);
 	expect(await gemini.ask("Hello!")).toBe("Hi!");
 });
 
 test("Gemini.ask() with Previous Messages", async () => {
-	global.fetch = vi.fn();
-	fetch.mockReturnValueOnce(createFetchResponse(generateContentResponse));
+	global.fetch = vi.fn() as Mock;
+	(fetch as Mock).mockReturnValueOnce(
+		createFetchResponse(generateContentResponse)
+	);
 
 	const gemini = new Gemini(API_KEY);
 	const fileBuffer = fs.readFileSync(`${__dirname}/assets/test.jpg`);
@@ -119,8 +124,10 @@ test("Gemini.ask() with Previous Messages", async () => {
 });
 
 test("Gemini.ask() with Data", async () => {
-	global.fetch = vi.fn();
-	fetch.mockReturnValueOnce(createFetchResponse(generateContentResponse));
+	global.fetch = vi.fn() as Mock;
+	(fetch as Mock).mockReturnValueOnce(
+		createFetchResponse(generateContentResponse)
+	);
 
 	const gemini = new Gemini(API_KEY);
 	const fileBuffer = fs.readFileSync(`${__dirname}/assets/test.jpg`);
@@ -134,8 +141,10 @@ test("Gemini.ask() with Data", async () => {
 });
 
 test("Gemini.ask() with JSON Response", async () => {
-	global.fetch = vi.fn();
-	fetch.mockReturnValueOnce(createFetchResponse(generateContentResponse));
+	global.fetch = vi.fn() as Mock;
+	(fetch as Mock).mockReturnValueOnce(
+		createFetchResponse(generateContentResponse)
+	);
 
 	const gemini = new Gemini(API_KEY);
 
@@ -159,7 +168,8 @@ test("Fetch Polyfill", async () => {
 });
 
 test("Gemini.embed()", async () => {
-	fetch.mockReturnValueOnce(createFetchResponse(embedResponse));
+	global.fetch = vi.fn() as Mock;
+	(fetch as Mock).mockReturnValueOnce(createFetchResponse(embedResponse));
 
 	const gemini = new Gemini(API_KEY);
 
@@ -167,7 +177,8 @@ test("Gemini.embed()", async () => {
 });
 
 test("Gemini.count()", async () => {
-	fetch.mockReturnValueOnce(createFetchResponse(countResponse));
+	global.fetch = vi.fn() as Mock;
+	(fetch as Mock).mockReturnValueOnce(createFetchResponse(countResponse));
 
 	const gemini = new Gemini(API_KEY);
 
@@ -175,7 +186,10 @@ test("Gemini.count()", async () => {
 });
 
 test("Gemini.createChat()", async () => {
-	fetch.mockReturnValueOnce(createFetchResponse(generateContentResponse));
+	global.fetch = vi.fn() as Mock;
+	(fetch as Mock).mockReturnValueOnce(
+		createFetchResponse(generateContentResponse)
+	);
 
 	const gemini = new Gemini(API_KEY);
 	const chat = gemini.createChat();
@@ -203,7 +217,10 @@ test("Gemini.createChat()", async () => {
 });
 
 test("Gemini.createChat() with JSON", async () => {
-	fetch.mockReturnValueOnce(createFetchResponse(generateContentResponse));
+	global.fetch = vi.fn() as Mock;
+	(fetch as Mock).mockReturnValueOnce(
+		createFetchResponse(generateContentResponse)
+	);
 
 	const gemini = new Gemini(API_KEY);
 	const chat = gemini.createChat();

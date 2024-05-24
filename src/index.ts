@@ -454,3 +454,15 @@ class Chat {
 }
 
 export default Gemini;
+
+export type {
+	Format,
+	Message,
+	Part,
+	GeminiResponse,
+	CommandResponseMap,
+	CommandOptionMap,
+	GeminiOptions,
+	ChatOptions,
+	ChatAskOptions,
+};

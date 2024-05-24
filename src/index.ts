@@ -370,7 +370,7 @@ class Gemini {
 		return this.switchFormat(parsedOptions.format)(await response.json());
 	}
 
-	createChat(options: ChatOptions) {
+	createChat(options: Partial<ChatOptions> = {}) {
 		return new Chat(this, options);
 	}
 }

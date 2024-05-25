@@ -323,6 +323,8 @@ await gemini.ask("Hi!");
 
 In this array, which represents ordered "parts", you can put strings, or Buffers (these are what you get directly from `fs.readFileSync()`!). These will be fed, in order to Gemini.
 
+Gemini accepts most major file formats, so you shouldn't have to worry about what format you give it. However, check out a [comprehensive list here](https://ai.google.dev/gemini-api/docs/prompting_with_media?lang=javascript#supported_file_formats).
+
 There's a whole ton of optimizations under the hood for file uploads too, but you don't have to worry about them! [Learn more here...](#optimized-file-uploads)
 
 _Example:_

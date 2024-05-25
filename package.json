@@ -2,7 +2,7 @@
 	"name": "gemini-ai",
 	"version": "2.0.0",
 	"author": "EvanZhouDev",
-	"description": "The easiest way to use the powerful Google Gemini model.",
+	"description": "The simpler JavaScript Gemini SDK",
 	"license": "GPL-3.0",
 	"repository": {
 		"type": "git",

@@ -73,7 +73,7 @@ And, there's also more!
 
 - 📝 [**Optimized File Uploads**](#optimized-file-uploads): Automatically uses Google's File API when necessary
 - 📁 [**Automatic File Type Detection**](#optimized-file-uploads): Gemini AI will detect MIME types of files automatically
-- 🧩 [**Automatic Request Creation**](): Auto-formats your requests—So you don't have to.
+- 🧩 [**Automatic Request Creation**](#array-form): Auto-formats your requests—So you don't have to.
 
 ## Table of Contents
 

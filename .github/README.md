@@ -224,7 +224,7 @@ With Gemini AI v2, large files like videos and audio will automatically be detec
 
 This ensures the fastest file upload experience, while ensuring all your files are safely included.
 
-Gemini also automatically detects the MIME type of your file to pass to the server, so you don't need to worry abotu it.
+Gemini also automatically detects the MIME type of your file to pass to the server, so you don't need to worry about it.
 
 ### Proxy Support
 

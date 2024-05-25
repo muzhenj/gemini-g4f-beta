@@ -49,17 +49,16 @@ export const handleReader = async (
 ) => {
 	if (!response.body) throw new Error(await response.text());
 
-	const reader = response.body
-		.pipeThrough(new PolyfillTextDecoderStream())
-		.getReader();
+	const decoder = new TextDecoder("utf-8");
 
-	await reader.read().then(function processText({ done, value }) {
-		if (done) return;
-
-		cb(JSON.parse(value.replace(/^data: /, "")));
-
-		return reader.read().then(processText);
-	});
+	try {
+		const bodyIterator = response.body[Symbol.asyncIterator]();
+		for await (const chunk of bodyIterator) {
+			cb(JSON.parse(decoder.decode(chunk).replace(/^data: /, "")));
+		}
+	} catch (err) {
+		throw new Error(err.stack);
+	}
 };
 
 export const pairToMessage = (message: [string, string]): Message[] => {

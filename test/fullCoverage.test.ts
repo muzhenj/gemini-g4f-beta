@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import { expect, test, vi } from "vitest";
 import type { Mock } from "vitest";
-import Gemini from "../src/index.ts";
-import { Command, QueryResponseMap } from "../src/types.ts";
+import Gemini from "../src/index";
+import { Command, QueryResponseMap } from "../src/types";
 
 const API_KEY = "demo-key";
 
@@ -98,7 +98,7 @@ const countResponse: QueryResponseMap[Command.Count] = {
 test("Gemini.ask()", async () => {
 	global.fetch = vi.fn() as Mock;
 	(fetch as Mock).mockReturnValueOnce(
-		createFetchResponse(generateContentResponse),
+		createFetchResponse(generateContentResponse)
 	);
 
 	const gemini = new Gemini(API_KEY);
@@ -108,7 +108,7 @@ test("Gemini.ask()", async () => {
 test("Gemini.ask() with Previous Messages", async () => {
 	global.fetch = vi.fn() as Mock;
 	(fetch as Mock).mockReturnValueOnce(
-		createFetchResponse(generateContentResponse),
+		createFetchResponse(generateContentResponse)
 	);
 
 	const gemini = new Gemini(API_KEY);
@@ -119,14 +119,14 @@ test("Gemini.ask() with Previous Messages", async () => {
 			format: Gemini.JSON,
 			data: [fileBuffer],
 			messages: [["Hi", "Sup?"]],
-		}),
+		})
 	).toBe(generateContentResponse);
 });
 
 test("Gemini.ask() with Data", async () => {
 	global.fetch = vi.fn() as Mock;
 	(fetch as Mock).mockReturnValueOnce(
-		createFetchResponse(generateContentResponse),
+		createFetchResponse(generateContentResponse)
 	);
 
 	const gemini = new Gemini(API_KEY);
@@ -136,14 +136,14 @@ test("Gemini.ask() with Data", async () => {
 		await gemini.ask("What does this show?", {
 			format: Gemini.JSON,
 			data: [fileBuffer],
-		}),
+		})
 	).toBe(generateContentResponse);
 });
 
 test("Gemini.ask() with JSON Response", async () => {
 	global.fetch = vi.fn() as Mock;
 	(fetch as Mock).mockReturnValueOnce(
-		createFetchResponse(generateContentResponse),
+		createFetchResponse(generateContentResponse)
 	);
 
 	const gemini = new Gemini(API_KEY);
@@ -151,14 +151,14 @@ test("Gemini.ask() with JSON Response", async () => {
 	expect(
 		await gemini.ask("Hello!", {
 			format: Gemini.JSON,
-		}),
+		})
 	).toBe(generateContentResponse);
 });
 
 test("Fetch Polyfill", async () => {
 	const fetchPolyfill = vi.fn();
 	fetchPolyfill.mockReturnValueOnce(
-		createFetchResponse(generateContentResponse),
+		createFetchResponse(generateContentResponse)
 	);
 
 	const gemini = new Gemini(API_KEY, {
@@ -188,7 +188,7 @@ test("Gemini.count()", async () => {
 test("Gemini.createChat()", async () => {
 	global.fetch = vi.fn() as Mock;
 	(fetch as Mock).mockReturnValueOnce(
-		createFetchResponse(generateContentResponse),
+		createFetchResponse(generateContentResponse)
 	);
 
 	const gemini = new Gemini(API_KEY);
@@ -219,7 +219,7 @@ test("Gemini.createChat()", async () => {
 test("Gemini.createChat() with JSON", async () => {
 	global.fetch = vi.fn() as Mock;
 	(fetch as Mock).mockReturnValueOnce(
-		createFetchResponse(generateContentResponse),
+		createFetchResponse(generateContentResponse)
 	);
 
 	const gemini = new Gemini(API_KEY);
@@ -228,6 +228,6 @@ test("Gemini.createChat() with JSON", async () => {
 	expect(
 		await chat.ask("Hello!", {
 			format: Gemini.JSON,
-		}),
+		})
 	).toBe(generateContentResponse);
 });

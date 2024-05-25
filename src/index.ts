@@ -41,7 +41,7 @@ const uploadFile = async ({
 	const generateBlob = (
 		boundary: string,
 		file: Uint8Array | ArrayBuffer,
-		mime: string,
+		mime: string
 	) =>
 		new Blob([
 			`--${boundary}\r\nContent-Type: application/json; charset=utf-8\r\n\r\n${JSON.stringify(
@@ -49,7 +49,7 @@ const uploadFile = async ({
 					file: {
 						mimeType: mime,
 					},
-				},
+				}
 			)}\r\n--${boundary}\r\nContent-Type: ${mime}\r\n\r\n`,
 			file,
 			`\r\n--${boundary}--`,
@@ -101,7 +101,7 @@ const uploadFile = async ({
 
 export const messageToParts = async (
 	messages: (Uint8Array | ArrayBuffer | string)[],
-	gemini: Gemini,
+	gemini: Gemini
 ): Promise<Part[]> => {
 	const parts = [];
 
@@ -145,10 +145,16 @@ class Gemini {
 	static JSON = "json" as const;
 
 	constructor(key: string, options: Partial<GeminiOptions> = {}) {
+		if (!options.fetch && typeof fetch !== "function") {
+			throw new Error(
+				"Fetch is not defined globally. Please provide a polyfill. Learn more here: https://github.com/EvanZhouDev/gemini-ai?tab=readme-ov-file#how-to-polyfill-fetch"
+			);
+		}
+
 		const parsedOptions: GeminiOptions = {
 			...{
 				apiVersion: "v1beta",
-				fetch: fetch,
+				fetch: typeof fetch === "function" ? fetch : options.fetch,
 			},
 			...options,
 		};
@@ -161,7 +167,7 @@ class Gemini {
 	async query<C extends Command>(
 		model: string,
 		command: C,
-		body: QueryBodyMap[C],
+		body: QueryBodyMap[C]
 	): Promise<Response> {
 		const opts = {
 			method: "POST",
@@ -172,7 +178,7 @@ class Gemini {
 		};
 
 		const url = new URL(
-			`https://generativelanguage.googleapis.com/${this.apiVersion}/models/${model}:${command}`,
+			`https://generativelanguage.googleapis.com/${this.apiVersion}/models/${model}:${command}`
 		);
 
 		url.searchParams.append("key", this.key);
@@ -183,7 +189,7 @@ class Gemini {
 
 		if (!response.ok) {
 			throw new Error(
-				`There was an error when fetching Gemini.\n${await response.text()}`,
+				`There was an error when fetching Gemini.\n${await response.text()}`
 			);
 		}
 
@@ -192,7 +198,7 @@ class Gemini {
 
 	async count(
 		message: string,
-		options: Partial<CommandOptionMap[Command.Count]> = {},
+		options: Partial<CommandOptionMap[Command.Count]> = {}
 	): Promise<CommandResponseMap[Command.Count]> {
 		const parsedOptions: CommandOptionMap[Command.Count] = {
 			...{
@@ -213,7 +219,7 @@ class Gemini {
 		const response: Response = await this.query(
 			parsedOptions.model,
 			Command.Count,
-			body,
+			body
 		);
 
 		const output: QueryResponseMap[Command.Count] = await response.json();
@@ -222,7 +228,7 @@ class Gemini {
 
 	async embed(
 		message: string,
-		options: Partial<CommandOptionMap[Command.Embed]> = {},
+		options: Partial<CommandOptionMap[Command.Embed]> = {}
 	) {
 		const parsedOptions: CommandOptionMap[Command.Embed] = {
 			...{
@@ -242,7 +248,7 @@ class Gemini {
 		const response: Response = await this.query(
 			parsedOptions.model,
 			Command.Embed,
-			body,
+			body
 		);
 
 		const output: QueryResponseMap[Command.Embed] = await response.json();
@@ -260,8 +266,8 @@ class Gemini {
 					`Your prompt was blocked by Google. Here are the Harm Categories: \n${JSON.stringify(
 						response.candidates[0].safetyRatings,
 						null,
-						4,
-					)}`,
+						4
+					)}`
 				);
 			}
 
@@ -278,7 +284,7 @@ class Gemini {
 	private handleStream = async <F extends Format>(
 		response: Response,
 		format: F,
-		cb: (response: FormatType<F>) => void,
+		cb: (response: FormatType<F>) => void
 	) => {
 		const formatter: (response: GeminiResponse) => FormatType<F> =
 			this.switchFormat(format);
@@ -300,7 +306,7 @@ class Gemini {
 
 	async ask<F extends Format = typeof Gemini.TEXT>(
 		message: string | (string | Uint8Array | ArrayBuffer)[] | Message,
-		options: Partial<CommandOptionMap<F>[Command.Generate]> = {},
+		options: Partial<CommandOptionMap<F>[Command.Generate]> = {}
 	): Promise<CommandResponseMap<F>[Command.Generate]> {
 		const parsedOptions: CommandOptionMap<F>[Command.Generate] = {
 			...{
@@ -321,14 +327,12 @@ class Gemini {
 			: Command.Generate;
 
 		const contents = [
-			...parsedOptions.messages.flatMap(
-				(msg: [string, string] | Message) => {
-					if (Array.isArray(msg)) {
-						return pairToMessage(msg);
-					}
-					return msg;
-				},
-			),
+			...parsedOptions.messages.flatMap((msg: [string, string] | Message) => {
+				if (Array.isArray(msg)) {
+					return pairToMessage(msg);
+				}
+				return msg;
+			}),
 		];
 
 		if (!Array.isArray(message) && typeof message !== "string") {
@@ -358,14 +362,14 @@ class Gemini {
 		const response: Response = await this.query(
 			parsedOptions.model,
 			command,
-			body,
+			body
 		);
 
 		if (parsedOptions.stream) {
 			return this.handleStream(
 				response,
 				parsedOptions.format,
-				parsedOptions.stream,
+				parsedOptions.stream
 			);
 		}
 
@@ -403,7 +407,7 @@ class Chat {
 
 	async ask<F extends Format = typeof Gemini.TEXT>(
 		message: string | (string | Uint8Array | ArrayBuffer)[], // make this support Message
-		options: Partial<ChatAskOptions<F>> = {},
+		options: Partial<ChatAskOptions<F>> = {}
 	): Promise<CommandResponseMap<F>[Command.Generate]> {
 		const parsedConfig: CommandOptionMap<F>[Command.Generate] = {
 			...this.options,
@@ -416,7 +420,7 @@ class Chat {
 
 		if (this.messages.at(-1)?.role === "user") {
 			throw new Error(
-				"Gemini has not yet responded to your last message. Please ensure you are running chat commands asynchronously.",
+				"Gemini has not yet responded to your last message. Please ensure you are running chat commands asynchronously."
 			);
 		}
 
@@ -435,7 +439,7 @@ class Chat {
 							parsedConfig.stream(
 								options.format === Gemini.JSON
 									? (res as FormatType<F>)
-									: (res.candidates[0].content.parts[0].text as FormatType<F>),
+									: (res.candidates[0].content.parts[0].text as FormatType<F>)
 							)
 					: undefined,
 			});

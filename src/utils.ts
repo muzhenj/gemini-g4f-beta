@@ -51,9 +51,14 @@ export const handleReader = async (
 
 	const decoder = new TextDecoder("utf-8");
 
+	interface ReadableStream<T> {
+		[Symbol.asyncIterator](): AsyncIterator<T>;
+	}
+
 	try {
-		const bodyIterator = response.body[Symbol.asyncIterator]();
-		for await (const chunk of bodyIterator) {
+		// response.body has an asyncIterator in modern most browsers
+		// @ts-ignore
+		for await (const chunk of response.body) {
 			cb(JSON.parse(decoder.decode(chunk).replace(/^data: /, "")));
 		}
 	} catch (err) {

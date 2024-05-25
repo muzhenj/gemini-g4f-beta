@@ -17,7 +17,6 @@
 
 ## Quickstart
 
-
 Make a text request:
 
 ```javascript

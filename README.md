@@ -5,10 +5,10 @@
     <img alt="" src="https://img.shields.io/npm/v/gemini-ai.svg?label=NPM&logo=npm&style=for-the-badge&color=0470FF&logoColor=white">
   </a>
   <a aria-label="NPM Download Count" href="https://www.npmjs.com/package/gemini-ai">
-    <img alt="" src="https://img.shields.io/npm/dt/gemini-ai?label=Downloads&style=for-the-badge&color=67ACF3">
+    <img alt="" src="https://img.shields.io/npm/dt/gemini-ai?label=Downloads&style=for-the-badge&color=27B2FF">
   </a>
-  <a aria-label="palm-api Size" href="https://www.npmjs.com/package/gemini-ai">
-    <img alt="" src="https://img.shields.io/bundlephobia/minzip/gemini-ai?style=for-the-badge&color=F9DBBC">
+  <a aria-label="Gemini AI Size" href="https://www.npmjs.com/package/gemini-ai">
+    <img alt="" src="https://img.shields.io/bundlephobia/minzip/gemini-ai?style=for-the-badge&color=B3CAFF">
   </a>
 </p>
 <p align="center">
@@ -17,7 +17,8 @@
 
 ## Quickstart
 
-Make a text request (`gemini-pro`):
+
+Make a text request:
 
 ```javascript
 import Gemini from "gemini-ai";
@@ -27,7 +28,7 @@ const gemini = new Gemini(API_KEY);
 console.log(await gemini.ask("Hi!"));
 ```
 
-Make a streaming text request (`gemini-pro`):
+Make a streaming text request:
 
 ```javascript
 import Gemini from "gemini-ai";
@@ -39,7 +40,7 @@ gemini.ask("Hi!", {
 });
 ```
 
-Chat with Gemini (`gemini-pro`):
+Chat with Gemini:
 
 ```javascript
 import Gemini from "gemini-ai";

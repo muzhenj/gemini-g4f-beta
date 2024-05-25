@@ -278,7 +278,7 @@ import Gemini from "gemini-ai";
 const gemini = new Gemini(API_KEY);
 ```
 
-Learn how to add a `fetch` polyfill for the browser [here](#im-in-a-browser-environment-what-do-i-do).
+Learn how to add a `fetch` polyfill for the browser [here](#how-to-polyfill-fetch).
 
 ### Method Patterns
 

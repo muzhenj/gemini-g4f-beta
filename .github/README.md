@@ -67,16 +67,16 @@ That's nearly 4 times less code!
 
 </details>
 
-And there's no sacrifices either. Gemini AI uses Google's REST API under the hood, so you get simplicity without compromise.
+There's also more...
 
-And, there's also more!
-
+- ⚡ [**Native REST API**](#inititalization): Simplicity without compromise.
 - 📝 [**Optimized File Uploads**](#optimized-file-uploads): Automatically uses Google's File API when necessary
 - 📁 [**Automatic File Type Detection**](#optimized-file-uploads): Gemini AI will detect MIME types of files automatically
 - 🧩 [**Automatic Request Creation**](#array-form): Auto-formats your requests—So you don't have to.
 
 ## Table of Contents
 
+- [**Installation**](#installation)
 - [**Getting an API Key**](#getting-an-api-key)
 - [**Quickstart**](#quickstart)
 - [**Special Features**](#special-features)
@@ -89,6 +89,16 @@ And, there's also more!
   - [`Gemini.createChat()` Method](#geminicreatechat)
 - [**FAQ**](#faq)
 - [**Contributors**](#contributors)
+
+## Installation
+
+Install with the following command, or the command for your favorite package manager.
+
+```bash
+npm install gemini-ai
+```
+
+Gemini AI is a pure ES6 Module, which means you will have to use it with `import`. It is recommended that your project is also ES6, but [look in the FAQ]() for a CJS (`require()`) workaround.
 
 ## Getting an API Key
 
@@ -505,7 +515,7 @@ await gemini.ask([
 
 Learn more in the [dedicated section](#uploading-media).
 
-### What do I need to do for v2?
+### What do I need to change for v2?
 
 > Does everything still work?
 
@@ -564,6 +574,18 @@ import fetch from "node-fetch";
 
 const gemini = new Gemini(API_KEY, {
 	fetch: fetch,
+});
+```
+
+### How to use Gemini AI in a CJS environment
+
+> I got `Error [ERR_REQUIRE_ESM]: require() of ES Module`, what can I do?
+
+Gemini AI is a ESM (`import`) only module. It is recommended that you use ESM in your projects too. However, if you must use CJS, you can use dynamic imports. Here's an example:
+
+```javascript
+import("gemini-ai").then((Gemini) => {
+	let gemini = new Gemini(API_KEY);
 });
 ```
 

@@ -14,13 +14,13 @@ export class PolyfillTextDecoderStream extends TransformStream<
 		{
 			fatal = false,
 			ignoreBOM = false,
-		}: ConstructorParameters<typeof TextDecoder>[1] = {}
+		}: ConstructorParameters<typeof TextDecoder>[1] = {},
 	) {
 		const decoder = new TextDecoder(encoding, { fatal, ignoreBOM });
 		super({
 			transform(
 				chunk: Uint8Array,
-				controller: TransformStreamDefaultController<string>
+				controller: TransformStreamDefaultController<string>,
 			) {
 				const decoded = decoder.decode(chunk);
 				if (decoded.length > 0) {

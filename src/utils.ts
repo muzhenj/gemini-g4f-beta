@@ -1,6 +1,6 @@
-import { fileTypeFromBuffer, FileTypeResult } from "file-type";
-import type { GeminiResponse, Message } from "./types";
+import { FileTypeResult, fileTypeFromBuffer } from "file-type";
 import { PolyfillTextDecoderStream } from "./polyfillTextDecoderStream";
+import type { GeminiResponse, Message } from "./types";
 
 export const getFileType = async (buffer: Uint8Array | ArrayBuffer) => {
 	const fileType: FileTypeResult | undefined = await fileTypeFromBuffer(buffer);
@@ -37,7 +37,7 @@ export const getFileType = async (buffer: Uint8Array | ArrayBuffer) => {
 
 	if (format === undefined || !validMediaFormats.includes(format))
 		throw new Error(
-			"Please provide a valid file format that is accepted by Gemini. Learn more about valid formats here: TBD"
+			"Please provide a valid file format that is accepted by Gemini. Learn more about valid formats here: https://ai.google.dev/gemini-api/docs/prompting_with_media?lang=node#supported_file_formats"
 		);
 
 	return format;

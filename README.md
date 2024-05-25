@@ -15,8 +15,15 @@
   <a href="https://github.com/EvanZhouDev/gemini-ai?tab=readme-ov-file#documentation">Docs</a> | <a href="https://github.com/evanzhoudev/gemini-ai">GitHub</a> | <a href="https://github.com/EvanZhouDev/gemini-ai?tab=readme-ov-file#faq">FAQ</a>
 </p>
 
-## Quickstart
+## Installation
 
+Install with the following command, or the command for your favorite package manager.
+
+```bash
+npm install gemini-ai
+```
+
+## Quickstart
 
 Make a text request:
 
@@ -56,6 +63,7 @@ Read the full docs at https://github.com/EvanZhouDev/gemini-ai.
 
 #### Table of Contents
 
+- [**Installation**](https://github.com/EvanZhouDev/gemini-ai?tab=readme-ov-file#installation)
 - [**Getting an API Key**](https://github.com/EvanZhouDev/gemini-ai?tab=readme-ov-file#getting-an-api-key)
 - [**Quickstart**](https://github.com/EvanZhouDev/gemini-ai?tab=readme-ov-file#quickstart)
 - [**Special Features**](https://github.com/EvanZhouDev/gemini-ai?tab=readme-ov-file#special-features)

@@ -1,5 +1,4 @@
 import { FileTypeResult, fileTypeFromBuffer } from "file-type";
-import { PolyfillTextDecoderStream } from "./polyfillTextDecoderStream";
 import type { GeminiResponse, Message } from "./types";
 
 export const getFileType = async (buffer: Uint8Array | ArrayBuffer) => {

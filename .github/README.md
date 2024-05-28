@@ -449,7 +449,7 @@ Config available for `createChat`:
 | `temperature` | See [Google's parameter explanations](https://cloud.google.com/vertex-ai/docs/generative-ai/start/quickstarts/api-quickstart#parameter_definitions) | `1` |
 | `model` | `gemini-1.5-flash-latest` |
 | `maxOutputTokens` | Max tokens to output | `2048` |
-| `messages` | Array of `[userInput, modelOutput]` pairs to show how the bot is supposed to behave (or to continue a conversation) | `[]` |
+| `messages` | Array of `[userInput, modelOutput]` pairs to show how the bot is supposed to behave (or to continue a conversation), or a array of type `Message[]`, so you can directly input a previous `chat.messages` | `[]` |
 
 Example Usage:
 

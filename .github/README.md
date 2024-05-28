@@ -230,7 +230,13 @@ Furthermore, return types are also conditional based on what `format` you place 
 
 Google requires large files to be sent through their dedicated File API, instead of being included directly in the `POST` request.
 
-With Gemini AI v2, large files like videos and audio will automatically be detected and sent through the File API, while smaller images are still included inline—without you having to worry about any of that going on.
+With Gemini AI, your uploads are automatically optimized so that when it's necessary, your files are routed through the File API, but otherwise, it sends them inline, for peak performance.
+
+Here's how Gemini AI decides which files to send through the File API:
+
+1. All videos are automatically uploaded via Files API (because Gemini wouldn't accept them otherwise)
+2. If all of your files combined are under 20MB (Google-set limit), all non-videos will be included as `inline_data`, which is the faster method
+3. If all of your files combined are over 20MB, all files will be uploaded via File API
 
 This ensures the fastest file upload experience, while ensuring all your files are safely included.
 
@@ -576,6 +582,10 @@ const gemini = new Gemini(API_KEY, {
 	fetch: fetch,
 });
 ```
+
+The only fetch polyfill that is guarenteed support with Gemini AI is `node-fetch`. Under the hood, streaming uses `AsyncIterator`, which is supported by both Node native `fetch` and `node-fetch`.
+
+This is also supported in all major browsers except Safari, so if you face any problems, attempt to use a fetch polyfill that specifically supports `AsyncIterator`.
 
 ### How to use Gemini AI in a CJS environment
 

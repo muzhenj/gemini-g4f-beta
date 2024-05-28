@@ -157,7 +157,7 @@ export type CommandOptionMap<F extends Format = TextFormat> = {
 export type FormatType<T> = T extends JSONFormat ? GeminiResponse : string;
 
 export type ChatOptions = {
-	messages: [string, string][];
+	messages: [string, string][] | Message[];
 	temperature: number;
 	topP: number;
 	topK: number;

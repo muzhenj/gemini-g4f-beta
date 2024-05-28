@@ -66,8 +66,6 @@ const uploadFile = async ({
 		})
 		.then((res: Response) => res.json());
 
-	console.log(fileSendDataRaw);
-
 	const fileSendData = fileSendDataRaw.file;
 
 	let waitTime = 250; // Initial wait time in milliseconds
@@ -104,13 +102,22 @@ export const messageToParts = async (
 	gemini: Gemini
 ): Promise<Part[]> => {
 	const parts = [];
+	let totalBytes = 0;
 
 	for (const msg of messages) {
 		if (typeof msg === "string") {
 			parts.push({ text: msg });
 		} else if (msg instanceof ArrayBuffer || msg instanceof Uint8Array) {
+			totalBytes += Buffer.from(msg).byteLength;
 			const mimeType = await getFileType(msg);
-			if (!mimeType.startsWith("image")) {
+			if (!mimeType.startsWith("video")) {
+				parts.push({
+					inline_data: {
+						mime_type: await getFileType(msg),
+						data: Buffer.from(msg).toString("base64"),
+					},
+				});
+			} else {
 				const fileURI = await uploadFile({
 					file: msg,
 					mimeType: mimeType,
@@ -122,13 +129,25 @@ export const messageToParts = async (
 						fileUri: fileURI,
 					},
 				});
-			} else {
-				parts.push({
-					inline_data: {
-						mime_type: await getFileType(msg),
-						data: Buffer.from(msg).toString("base64"),
-					},
+			}
+		}
+	}
+
+	if (totalBytes > 20 * 1024 * 1024) {
+		for (const idx in parts) {
+			const part = parts[idx];
+			if (part.inline_data) {
+				const fileURI = await uploadFile({
+					file: Buffer.from(part.inline_data.data, "base64"),
+					mimeType: part.inline_data.mime_type,
+					gemini: gemini,
 				});
+				parts[idx] = {
+					fileData: {
+						mime_type: part.inline_data.mime_type,
+						fileUri: fileURI,
+					},
+				};
 			}
 		}
 	}
@@ -402,11 +421,16 @@ class Chat {
 		this.gemini = gemini;
 		this.options = parsedOptions;
 
-		this.messages = parsedOptions.messages.flatMap(pairToMessage);
+		if (parsedOptions.messages[0] && Array.isArray(parsedOptions.messages[0])) {
+			// @ts-ignore It is ensured that parsedOptions.messages is [string, string][] with the above check.
+			this.messages = parsedOptions.messages.flatMap(pairToMessage);
+		} else {
+			this.messages = parsedOptions.messages as Message[];
+		}
 	}
 
 	async ask<F extends Format = typeof Gemini.TEXT>(
-		message: string | (string | Uint8Array | ArrayBuffer)[], // make this support Message
+		message: string | (string | Uint8Array | ArrayBuffer)[] | Message,
 		options: Partial<ChatAskOptions<F>> = {}
 	): Promise<CommandResponseMap<F>[Command.Generate]> {
 		const parsedConfig: CommandOptionMap<F>[Command.Generate] = {
@@ -425,10 +449,17 @@ class Chat {
 		}
 
 		try {
-			const parsedMessage: Message = {
-				parts: await messageToParts([message].flat(), this.gemini),
-				role: "user",
-			};
+			let parsedMessage: Message;
+			if (!Array.isArray(message) && typeof message !== "string") {
+				if (message.role === "model")
+					throw new Error("Please prompt with role as 'user'");
+				parsedMessage = message;
+			} else {
+				parsedMessage = {
+					parts: await messageToParts([message].flat(), this.gemini),
+					role: "user",
+				};
+			}
 
 			const response = await this.gemini.ask(parsedMessage, {
 				...parsedConfig,

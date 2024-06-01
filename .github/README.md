@@ -370,17 +370,19 @@ Please check `src/types.ts` for more information about what is accepted in the `
 > [!NOTE]
 > These are Google REST API defaults.
 
-| Field Name        | Description                                                                                                                                                                                                    | Default Value |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
-| `format`          | Whether to return the detailed, raw JSON output. Typically not recommended, unless you are an expert. Can either be `Gemini.JSON` or `Gemini.TEXT`                                                             | `Gemini.TEXT` |
-| `topP`            | See [Google's parameter explanations](https://cloud.google.com/vertex-ai/docs/generative-ai/start/quickstarts/api-quickstart#parameter_definitions)                                                            | `0.94`        |
-| `topK`            | See [Google's parameter explanations](https://cloud.google.com/vertex-ai/docs/generative-ai/start/quickstarts/api-quickstart#parameter_definitions). Note that this field is **not** available on v1.5 models. | `32`          |
-| `temperature`     | See [Google's parameter explanations](https://cloud.google.com/vertex-ai/docs/generative-ai/start/quickstarts/api-quickstart#parameter_definitions)                                                            | `1`           |
-| `model`           | `gemini-1.5-flash-latest`                                                                                                                                                                                      |
-| `maxOutputTokens` | Max tokens to output                                                                                                                                                                                           | `2048`        |
-| `messages`        | Array of `[userInput, modelOutput]` pairs to show how the bot is supposed to behave                                                                                                                            | `[]`          |
-| `data`            | An array of `Buffer`s to input to the model. It is recommended that you [directly pass data through the message in v2](#uploading-media).                                                                      | `[]`          |
-| `stream`          | A function that is called with every new chunk of JSON or Text (depending on the format) that the model receives. [Learn more](#feature-highlight-streaming)                                                   | `undefined`   |
+| Field Name          | Description                                                                                                                                                                                                    | Default Value                                                                       |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `format`            | Whether to return the detailed, raw JSON output. Typically not recommended, unless you are an expert. Can either be `Gemini.JSON` or `Gemini.TEXT`                                                             | `Gemini.TEXT`                                                                       |
+| `topP`              | See [Google's parameter explanations](https://cloud.google.com/vertex-ai/docs/generative-ai/start/quickstarts/api-quickstart#parameter_definitions)                                                            | `0.94`                                                                              |
+| `topK`              | See [Google's parameter explanations](https://cloud.google.com/vertex-ai/docs/generative-ai/start/quickstarts/api-quickstart#parameter_definitions). Note that this field is **not** available on v1.5 models. | `32`                                                                                |
+| `temperature`       | See [Google's parameter explanations](https://cloud.google.com/vertex-ai/docs/generative-ai/start/quickstarts/api-quickstart#parameter_definitions)                                                            | `1`                                                                                 |
+| `model`             | `gemini-1.5-flash-latest`                                                                                                                                                                                      |
+| `maxOutputTokens`   | Max tokens to output                                                                                                                                                                                           | `2048`                                                                              |
+| `messages`          | Array of `[userInput, modelOutput]` pairs to show how the bot is supposed to behave                                                                                                                            | `[]`                                                                                |
+| `data`              | An array of `Buffer`s to input to the model. It is recommended that you [directly pass data through the message in v2](#uploading-media).                                                                      | `[]`                                                                                |
+| `stream`            | A function that is called with every new chunk of JSON or Text (depending on the format) that the model receives. [Learn more](#feature-highlight-streaming)                                                   | `undefined`                                                                         |
+| `safetySettings`    | An object that specifies the blocking threshold for each safety rating dimension. [Learn more](#how-to-set-safety-settings)                                                                                    | An object representing Google's defaults. [Learn more](#how-to-set-safety-settings) |
+| `systemInstruction` | Instruct what the model should act like (i.e. a persona, output format, style/tone, goals/rules, and additional context)                                                                                       | `""`                                                                                |
 
 Example Usage:
 
@@ -396,6 +398,45 @@ console.log(
 	})
 );
 ```
+
+#### How to set Safety Settings
+
+Google categorizes the Gemini's response with 4 main categories of safety ratings. Here's an overview:
+
+| Category Name     | Description                               | Gemini AI Field name |
+| ----------------- | ----------------------------------------- | -------------------- |
+| Harassment        | Negative/Harmful comments towards someone | `harassment`         |
+| Hate Speech       | Rude/Disrespectful/Profane                | `hate`               |
+| Sexually Explicit | General sexual/lewd content               | `sexual`             |
+| Dangerous         | Encourages harmful acts                   | `dangerous`          |
+
+[Learn more at Google's official docs here.](https://ai.google.dev/gemini-api/docs/safety-settings#safety-settings)
+
+In order to set each category, provide an object like this into the `safetySettings` configuration option:
+
+```javascript
+await gemini.ask("Hello!", {
+	safetySettings: {
+		hate: Gemini.SafetyThreshold.BLOCK_SOME,
+		sexual: Gemini.SafetyThreshold.BLOCK_SOME,
+		harassment: Gemini.SafetyThreshold.BLOCK_SOME,
+		dangerous: Gemini.SafetyThreshold.BLOCK_SOME,
+	},
+});
+```
+
+Note that the names of the categories have been shortened, which you can reference above in the table.
+
+You can assign 4 different thresholds (which are an enum under `Gemini.SafetyThreshold`) of blocking content, listed here from the strictest to the least strict:
+
+| Enum Name                           | Google Internal Name     | Simple Description (In Specified Safety Category) |
+| ----------------------------------- | ------------------------ | ------------------------------------------------- |
+| `Gemini.SafetyThreshold.BLOCK_MOST` | `BLOCK_LOW_AND_ABOVE`    | Blocks everything that is potentially unsafe      |
+| `Gemini.SafetyThreshold.BLOCK_SOME` | `BLOCK_MEDIUM_AND_ABOVE` | Blocks moderately unsafe content (Default)        |
+| `Gemini.SafetyThreshold.BLOCK_FEW`  | `BLOCK_ONLY_HIGH`        | Blocks only highly unsafe content                 |
+| `Gemini.SafetyThreshold.BLOCK_NONE` | `BLOCK_NONE`             | Blocks nothing                                    |
+
+By Google's default, all categories are set to `BLOCK_SOME`. Google [also states](https://ai.google.dev/gemini-api/docs/safety-settings) that "Adjusting to lower safety settings will trigger a more indepth review process of your application."
 
 ### `Gemini.count()`
 
@@ -490,7 +531,18 @@ console.log(await newChat.ask("What's the last thing I said?"));
 
 ## FAQ
 
+Common Questions:
+
+- [What's the difference between the `data` config and directly passing buffers in the message?](#whats-the-difference-between-data-and-directly-passing-buffers-in-the-message)
+- [What do I need to update for Gemini AI v2?](#what-do-i-need-to-change-for-v2)
+- [What is the default model?/Why is it the default model?](#what-is-the-default-model)
+- [How do I change the API version?](#how-do-i-change-the-api-version)
+- [How do I polyfill fetch?](#how-do-i-polyfill-fetch)
+- [How do I use Gemini AI in CJS?/Cannot `require()` ESM Module](#how-do-i-use-gemini-ai-in-a-cjs-environment)
+
 ### What's the difference between `data` and directly passing buffers in the message?
+
+> Are they the same thing?
 
 `data` was the old way to pass Media data. It is now not recommended, but kept for backwards compatability. The new method is to simply pass an array of strings/buffers into the first parameter of `ask()`. The major benefit is now you can include strings between buffers, which you couldn't do before. Here's a quick demo of how to migrate:
 
@@ -552,7 +604,7 @@ console.log(
 );
 ```
 
-### Changing the API Version
+### How do I change the API Version?
 
 > What if I want to use a deprecated command?
 
@@ -568,7 +620,7 @@ const gemini = new Gemini(API_KEY, {
 });
 ```
 
-### How to Polyfill Fetch
+### How do I Polyfill Fetch?
 
 > I'm in a browser environment! What do I do?
 
@@ -583,11 +635,9 @@ const gemini = new Gemini(API_KEY, {
 });
 ```
 
-The only fetch polyfill that is guarenteed support with Gemini AI is `node-fetch`. Under the hood, streaming uses `AsyncIterator`, which is supported by both Node native `fetch` and `node-fetch`.
+Nearly all `fetch` polyfills should work as of Gemini AI v2.2, as streaming is now done mainly through `response.body.getReader().read()`, but with a `AsyncIterator` fallback, so nearly all environments should be covered.
 
-This is also supported in all major browsers except Safari, so if you face any problems, attempt to use a fetch polyfill that specifically supports `AsyncIterator`.
-
-### How to use Gemini AI in a CJS environment
+### How do I use Gemini AI in a CJS environment?
 
 > I got `Error [ERR_REQUIRE_ESM]: require() of ES Module`, what can I do?
 

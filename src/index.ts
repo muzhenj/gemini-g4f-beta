@@ -344,11 +344,12 @@ class Gemini {
 					harassment: Gemini.SafetyThreshold.BLOCK_SOME,
 					dangerous: Gemini.SafetyThreshold.BLOCK_SOME,
 				},
+				systemInstruction: "",
 			},
 			...options,
 		};
 
-		const safety_settings = [
+		const safetySettings = [
 			{
 				category: HarmCategory.HateSpeech,
 				threshold: parsedOptions.safetySettings.hate,
@@ -404,7 +405,11 @@ class Gemini {
 				topP: parsedOptions.topP,
 				topK: parsedOptions.topK,
 			},
-			safety_settings,
+			safetySettings,
+			systemInstruction: {
+				parts: [{ text: parsedOptions.systemInstruction }],
+				role: "system",
+			},
 		};
 
 		const response: Response = await this.query(
@@ -443,6 +448,7 @@ class Chat {
 				topK: 1,
 				model: "gemini-1.5-flash-latest",
 				maxOutputTokens: 2048,
+				systemInstruction: "",
 			},
 			...options,
 		};

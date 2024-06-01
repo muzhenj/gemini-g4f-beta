@@ -30,7 +30,7 @@ type TextPart = { text: string };
 
 export type Part = TextPart | RemoteFilePart | InlineFilePart;
 
-type Role = "user" | "model";
+type Role = "user" | "model" | "system";
 
 type SafetyRating = { category: string; probability: string };
 
@@ -78,7 +78,8 @@ type GenerateContentBody = {
 		topP: number;
 		topK: number;
 	};
-	safety_settings: { category: HarmCategory; threshold: SafetyThreshold }[];
+	safetySettings: { category: HarmCategory; threshold: SafetyThreshold }[];
+	systemInstruction: Message;
 };
 
 /**
@@ -151,6 +152,7 @@ export type CommandOptionMap<F extends Format = TextFormat> = {
 		maxOutputTokens: number;
 		model: string;
 		data: Buffer[];
+		systemInstruction: string;
 		safetySettings: {
 			hate: SafetyThreshold;
 			sexual: SafetyThreshold;
@@ -188,6 +190,7 @@ export type ChatOptions = {
 	topK: number;
 	model: string;
 	maxOutputTokens: number;
+	systemInstruction: string;
 };
 
 export type ChatAskOptions<F extends Format = TextFormat> = {

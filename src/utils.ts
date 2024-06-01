@@ -36,15 +36,22 @@ export const getFileType = async (buffer: Uint8Array | ArrayBuffer) => {
 
 	if (format === undefined || !validMediaFormats.includes(format))
 		throw new Error(
-			"Please provide a valid file format that is accepted by Gemini. Learn more about valid formats here: https://ai.google.dev/gemini-api/docs/prompting_with_media?lang=node#supported_file_formats"
+			"Please provide a valid file format that is accepted by Gemini. Learn more about valid formats here: https://ai.google.dev/gemini-api/docs/prompting_with_media?lang=node#supported_file_formats",
 		);
 
 	return format;
 };
 
+export class SafetyError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = "SafetyError";
+	}
+}
+
 export const handleReader = async (
 	response: Response,
-	cb: (response: GeminiResponse) => void
+	cb: (response: GeminiResponse) => void,
 ) => {
 	if (!response.body) throw new Error(await response.text());
 
@@ -62,6 +69,7 @@ export const handleReader = async (
 			return reader.read().then(processText);
 		});
 	} catch (e) {
+		if (e instanceof SafetyError) throw e;
 		// This solution breaks on Safari or any fetch polyfill without AsyncIterators, but it works for node-fetch.
 		try {
 			// response.body has an asyncIterator in modern most browsers
@@ -70,6 +78,7 @@ export const handleReader = async (
 				cb(JSON.parse(decoder.decode(chunk).replace(/^data: /, "")));
 			}
 		} catch (err) {
+			if (err instanceof SafetyError) throw err;
 			throw new Error(err.stack);
 		}
 	}

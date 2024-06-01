@@ -53,7 +53,10 @@ export const handleReader = async (
 	response: Response,
 	cb: (response: GeminiResponse) => void,
 ) => {
-	if (!response.body) throw new Error(await response.text());
+	if (!response.body)
+		throw new Error(
+			`An error occurred when attempting to read Gemini's response ${await response.text()}`,
+		);
 
 	const decoder = new TextDecoder("utf-8");
 
@@ -79,7 +82,9 @@ export const handleReader = async (
 			}
 		} catch (err) {
 			if (err instanceof SafetyError) throw err;
-			throw new Error(err.stack);
+			throw new Error(
+				`An error occurred when attempting to stream content from Gemini: ${err.stack}`,
+			);
 		}
 	}
 };

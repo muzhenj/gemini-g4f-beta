@@ -80,7 +80,9 @@ const uploadFile = async ({
 			const data = await response.json();
 
 			if (data.error) {
-				throw new Error(data.error.message);
+				throw new Error(
+					`Google's File API responded with an error: ${data.error.message}`,
+				);
 			}
 
 			if (data.state === "ACTIVE") break;
@@ -89,8 +91,9 @@ const uploadFile = async ({
 
 			waitTime = Math.min(waitTime * 1.5, MAX_BACKOFF);
 		} catch (error) {
-			console.error(`An error occurred: ${error.message}`);
-			break;
+			throw new Error(
+				`An error occurred while uploading to Google's File API: ${error.message}`,
+			);
 		}
 	}
 
@@ -209,7 +212,7 @@ class Gemini {
 
 		if (!response.ok) {
 			throw new Error(
-				`There was an error when fetching Gemini.\n${await response.text()}`,
+				`There was an error when querying Gemini.\n${await response.text()}`,
 			);
 		}
 
@@ -489,45 +492,41 @@ class Chat {
 			);
 		}
 
-		try {
-			let parsedMessage: Message;
-			if (!Array.isArray(message) && typeof message !== "string") {
-				if (message.role === "model")
-					throw new Error("Please prompt with role as 'user'");
-				parsedMessage = message;
-			} else {
-				parsedMessage = {
-					parts: await messageToParts([message].flat(), this.gemini),
-					role: "user",
-				};
-			}
-
-			const response = await this.gemini.ask(parsedMessage, {
-				...parsedConfig,
-				format: Gemini.JSON,
-				messages: this.messages,
-				stream: parsedConfig.stream
-					? (res) =>
-							parsedConfig.stream(
-								options.format === Gemini.JSON
-									? (res as FormatType<F>)
-									: (res.candidates[0].content.parts[0].text as FormatType<F>),
-							)
-					: undefined,
-			});
-
-			this.messages.push(parsedMessage);
-			this.messages.push({
-				parts: response.candidates[0].content.parts,
-				role: "model",
-			});
-
-			return options.format === Gemini.JSON
-				? (response as FormatType<F>)
-				: (response.candidates[0].content.parts[0].text as FormatType<F>);
-		} catch (e) {
-			throw new Error(e);
+		let parsedMessage: Message;
+		if (!Array.isArray(message) && typeof message !== "string") {
+			if (message.role === "model")
+				throw new Error("Please prompt with role as 'user'");
+			parsedMessage = message;
+		} else {
+			parsedMessage = {
+				parts: await messageToParts([message].flat(), this.gemini),
+				role: "user",
+			};
 		}
+
+		const response = await this.gemini.ask(parsedMessage, {
+			...parsedConfig,
+			format: Gemini.JSON,
+			messages: this.messages,
+			stream: parsedConfig.stream
+				? (res) =>
+						parsedConfig.stream(
+							options.format === Gemini.JSON
+								? (res as FormatType<F>)
+								: (res.candidates[0].content.parts[0].text as FormatType<F>),
+						)
+				: undefined,
+		});
+
+		this.messages.push(parsedMessage);
+		this.messages.push({
+			parts: response.candidates[0].content.parts,
+			role: "model",
+		});
+
+		return options.format === Gemini.JSON
+			? (response as FormatType<F>)
+			: (response.candidates[0].content.parts[0].text as FormatType<F>);
 	}
 }
 

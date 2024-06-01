@@ -1,4 +1,4 @@
-import { Command } from "./types";
+import { Command, HarmCategory, SafetyThreshold } from "./types";
 
 import type {
 	ChatAskOptions,
@@ -15,7 +15,7 @@ import type {
 	QueryResponseMap,
 } from "./types";
 
-import { getFileType, handleReader, pairToMessage } from "./utils";
+import { SafetyError, getFileType, handleReader, pairToMessage } from "./utils";
 
 const uploadFile = async ({
 	file,
@@ -162,6 +162,7 @@ class Gemini {
 
 	static TEXT = "text" as const;
 	static JSON = "json" as const;
+	static SafetyThreshold = SafetyThreshold;
 
 	constructor(key: string, options: Partial<GeminiOptions> = {}) {
 		if (!options.fetch && typeof fetch !== "function") {
@@ -281,7 +282,7 @@ class Gemini {
 		<F extends Format>(format: F = Gemini.TEXT as F) =>
 		(response: GeminiResponse): FormatType<F> => {
 			if (response.candidates[0].finishReason === "SAFETY") {
-				throw new Error(
+				throw new SafetyError(
 					`Your prompt was blocked by Google. Here are the Harm Categories: \n${JSON.stringify(
 						response.candidates[0].safetyRatings,
 						null,
@@ -337,9 +338,34 @@ class Gemini {
 				maxOutputTokens: 2048,
 				data: [],
 				messages: [],
+				safetySettings: {
+					hate: Gemini.SafetyThreshold.BLOCK_SOME,
+					sexual: Gemini.SafetyThreshold.BLOCK_SOME,
+					harassment: Gemini.SafetyThreshold.BLOCK_SOME,
+					dangerous: Gemini.SafetyThreshold.BLOCK_SOME,
+				},
 			},
 			...options,
 		};
+
+		const safety_settings = [
+			{
+				category: HarmCategory.HateSpeech,
+				threshold: parsedOptions.safetySettings.hate,
+			},
+			{
+				category: HarmCategory.SexuallyExplicit,
+				threshold: parsedOptions.safetySettings.sexual,
+			},
+			{
+				category: HarmCategory.Harassment,
+				threshold: parsedOptions.safetySettings.harassment,
+			},
+			{
+				category: HarmCategory.DangerousContent,
+				threshold: parsedOptions.safetySettings.dangerous,
+			},
+		];
 
 		const command = parsedOptions.stream
 			? Command.StreamGenerate
@@ -378,6 +404,7 @@ class Gemini {
 				topP: parsedOptions.topP,
 				topK: parsedOptions.topK,
 			},
+			safety_settings,
 		};
 
 		const response: Response = await this.query(
@@ -440,6 +467,12 @@ class Chat {
 			...{
 				data: [],
 				format: Gemini.TEXT as F,
+				safetySettings: {
+					hate: Gemini.SafetyThreshold.BLOCK_SOME,
+					sexual: Gemini.SafetyThreshold.BLOCK_SOME,
+					harassment: Gemini.SafetyThreshold.BLOCK_SOME,
+					dangerous: Gemini.SafetyThreshold.BLOCK_SOME,
+				},
 			},
 			...options,
 		};

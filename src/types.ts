@@ -60,6 +60,13 @@ export enum Command {
 	Count = "countTokens",
 }
 
+export enum HarmCategory {
+	HateSpeech = "HARM_CATEGORY_HATE_SPEECH",
+	SexuallyExplicit = "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+	Harassment = "HARM_CATEGORY_HARASSMENT",
+	DangerousContent = "HARM_CATEGORY_DANGEROUS_CONTENT",
+}
+
 /**
  * The body used for the API call to generateContent or streamGenerateContent
  */
@@ -71,6 +78,7 @@ type GenerateContentBody = {
 		topP: number;
 		topK: number;
 	};
+	safety_settings: { category: HarmCategory; threshold: SafetyThreshold }[];
 };
 
 /**
@@ -143,6 +151,12 @@ export type CommandOptionMap<F extends Format = TextFormat> = {
 		maxOutputTokens: number;
 		model: string;
 		data: Buffer[];
+		safetySettings: {
+			hate: SafetyThreshold;
+			sexual: SafetyThreshold;
+			harassment: SafetyThreshold;
+			dangerous: SafetyThreshold;
+		};
 		messages: ([string, string] | Message)[];
 		stream?(stream: CommandResponseMap<F>[Command.StreamGenerate]): void;
 	};
@@ -153,6 +167,17 @@ export type CommandOptionMap<F extends Format = TextFormat> = {
 		model: string;
 	};
 };
+
+export enum SafetyThreshold {
+	// Content with NEGLIGIBLE will be allowed.
+	BLOCK_MOST = "BLOCK_LOW_AND_ABOVE",
+	// Content with NEGLIGIBLE and LOW will be allowed.
+	BLOCK_SOME = "BLOCK_MEDIUM_AND_ABOVE",
+	// Content with NEGLIGIBLE, LOW, and MEDIUM will be allowed.
+	BLOCK_FEW = "BLOCK_ONLY_HIGH",
+	// All content will be allowed.
+	BLOCK_NONE = "BLOCK_NONE",
+}
 
 export type FormatType<T> = T extends JSONFormat ? GeminiResponse : string;
 

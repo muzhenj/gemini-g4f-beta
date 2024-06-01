@@ -50,18 +50,28 @@ export const handleReader = async (
 
 	const decoder = new TextDecoder("utf-8");
 
-	interface ReadableStream<T> {
-		[Symbol.asyncIterator](): AsyncIterator<T>;
-	}
-
 	try {
-		// response.body has an asyncIterator in modern most browsers
-		// @ts-ignore
-		for await (const chunk of response.body) {
-			cb(JSON.parse(decoder.decode(chunk).replace(/^data: /, "")));
+		// This solution works for nearly every fetch, except for the node-fetch polyfill.
+		const reader = response.body.getReader();
+
+		await reader.read().then(function processText({ done, value }) {
+			if (done) return;
+
+			cb(JSON.parse(decoder.decode(value).replace(/^data: /, "")));
+
+			return reader.read().then(processText);
+		});
+	} catch (e) {
+		// This solution breaks on Safari or any fetch polyfill without AsyncIterators, but it works for node-fetch.
+		try {
+			// response.body has an asyncIterator in modern most browsers
+			// @ts-ignore
+			for await (const chunk of response.body) {
+				cb(JSON.parse(decoder.decode(chunk).replace(/^data: /, "")));
+			}
+		} catch (err) {
+			throw new Error(err.stack);
 		}
-	} catch (err) {
-		throw new Error(err.stack);
 	}
 };
 

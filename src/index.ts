@@ -1,4 +1,4 @@
-import { Command, HarmCategory, SafetyThreshold } from "./types";
+import { Command, HarmCategory, SafetyThreshold, SchemaType } from "./types";
 
 import type {
 	ChatAskOptions,
@@ -166,6 +166,7 @@ class Gemini {
 	static TEXT = "text" as const;
 	static JSON = "json" as const;
 	static SafetyThreshold = SafetyThreshold;
+	static SchemaType = SchemaType;
 
 	constructor(key: string, options: Partial<GeminiOptions> = {}) {
 		if (!options.fetch && typeof fetch !== "function") {
@@ -348,6 +349,7 @@ class Gemini {
 					dangerous: Gemini.SafetyThreshold.BLOCK_SOME,
 				},
 				systemInstruction: "",
+				jsonSchema: undefined,
 			},
 			...options,
 		};
@@ -394,6 +396,14 @@ class Gemini {
 			const messageParts = [message, parsedOptions.data].flat();
 			const parts = await messageToParts(messageParts, this);
 
+			if (parsedOptions.jsonSchema) {
+				parts.push({
+					text: `Use this JSON schema: <JSONSchema>${JSON.stringify(
+						parsedOptions.jsonSchema,
+					)}</JSONSchema>`,
+				});
+			}
+
 			contents.push({
 				parts: parts,
 				role: "user",
@@ -407,13 +417,19 @@ class Gemini {
 				maxOutputTokens: parsedOptions.maxOutputTokens,
 				topP: parsedOptions.topP,
 				topK: parsedOptions.topK,
+				responseMimeType: parsedOptions.jsonSchema
+					? "application/json"
+					: undefined,
 			},
 			safetySettings,
-			systemInstruction: {
+		};
+
+		if (parsedOptions.systemInstruction !== "") {
+			body.systemInstruction = {
 				parts: [{ text: parsedOptions.systemInstruction }],
 				role: "system",
-			},
-		};
+			};
+		}
 
 		const response: Response = await this.query(
 			parsedOptions.model,
@@ -482,6 +498,8 @@ class Chat {
 					harassment: Gemini.SafetyThreshold.BLOCK_SOME,
 					dangerous: Gemini.SafetyThreshold.BLOCK_SOME,
 				},
+				systemInstruction: "",
+				jsonSchema: undefined,
 			},
 			...options,
 		};

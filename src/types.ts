@@ -77,9 +77,11 @@ type GenerateContentBody = {
 		temperature: number;
 		topP: number;
 		topK: number;
+		responseMimeType?: string;
+		responseSchema?: Schema;
 	};
 	safetySettings: { category: HarmCategory; threshold: SafetyThreshold }[];
-	systemInstruction: Message;
+	systemInstruction?: Message;
 };
 
 /**
@@ -161,6 +163,7 @@ export type CommandOptionMap<F extends Format = TextFormat> = {
 		};
 		messages: ([string, string] | Message)[];
 		stream?(stream: CommandResponseMap<F>[Command.StreamGenerate]): void;
+		jsonSchema: boolean | Schema;
 	};
 	[Command.Embed]: {
 		model: string;
@@ -197,4 +200,65 @@ export type ChatAskOptions<F extends Format = TextFormat> = {
 	format: F;
 	data: [];
 	stream?(stream: CommandResponseMap<F>[Command.StreamGenerate]): void;
+	jsonSchema: boolean | Schema;
 };
+
+export enum SchemaType {
+	/** String type. */
+	STRING = "STRING",
+	/** Number type. */
+	NUMBER = "NUMBER",
+	/** Integer type. */
+	INTEGER = "INTEGER",
+	/** Boolean type. */
+	BOOLEAN = "BOOLEAN",
+	/** Array type. */
+	ARRAY = "ARRAY",
+	/** Object type. */
+	OBJECT = "OBJECT",
+}
+
+/**
+ * Schema is used to define the format of input/output data.
+ * Represents a select subset of an OpenAPI 3.0 schema object.
+ * More fields may be added in the future as needed.
+ * @public
+ */
+export interface Schema {
+	/**
+	 * Optional. The type of the property. {@link
+	 * FunctionDeclarationSchemaType}.
+	 */
+	type?: SchemaType;
+	/** Optional. The format of the property. */
+	format?: string;
+	/** Optional. The description of the property. */
+	description?: string;
+	/** Optional. Whether the property is nullable. */
+	nullable?: boolean;
+	/** Optional. The items of the property. {@link FunctionDeclarationSchema} */
+	items?: FunctionDeclarationSchema;
+	/** Optional. The enum of the property. */
+	enum?: string[];
+	/** Optional. Map of {@link FunctionDeclarationSchema}. */
+	properties?: { [k: string]: FunctionDeclarationSchema };
+	/** Optional. Array of required property. */
+	required?: string[];
+	/** Optional. The example of the property. */
+	example?: unknown;
+}
+
+/**
+ * Schema for parameters passed to {@link FunctionDeclaration.parameters}.
+ * @public
+ */
+interface FunctionDeclarationSchema {
+	/** The type of the parameter. */
+	type: SchemaType;
+	/** The format of the parameter. */
+	properties: { [k: string]: Schema };
+	/** Optional. Description of the parameter. */
+	description?: string;
+	/** Optional. Array of required parameters. */
+	required?: string[];
+}

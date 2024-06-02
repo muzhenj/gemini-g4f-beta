@@ -357,7 +357,7 @@ await gemini.ask([
 ```
 
 > [!NOTE]
-> that you can also place buffers in the `data` field in the config (this is the v1 method, but it still works). These buffers will be placed, in order, directly after the content in the main message.
+> You can also place buffers in the `data` field in the config (this is the v1 method, but it still works). These buffers will be placed, in order, directly after the content in the main message.
 
 ##### Message Form:
 
@@ -383,6 +383,7 @@ Please check `src/types.ts` for more information about what is accepted in the `
 | `stream`            | A function that is called with every new chunk of JSON or Text (depending on the format) that the model receives. [Learn more](#feature-highlight-streaming)                                                   | `undefined`                                                                         |
 | `safetySettings`    | An object that specifies the blocking threshold for each safety rating dimension. [Learn more](#how-to-set-safety-settings)                                                                                    | An object representing Google's defaults. [Learn more](#how-to-set-safety-settings) |
 | `systemInstruction` | Instruct what the model should act like (i.e. a persona, output format, style/tone, goals/rules, and additional context)                                                                                       | `""`                                                                                |
+| `jsonSchema`        | Make Gemini always output in a set JSON schema. Set to `true` to let Gemini pick the schema, or give a specific schema. [Learn more]()                                                                         | `undefined`                                                                         |
 
 Example Usage:
 
@@ -437,6 +438,49 @@ You can assign 4 different thresholds (which are an enum under `Gemini.SafetyThr
 | `Gemini.SafetyThreshold.BLOCK_NONE` | `BLOCK_NONE`             | Blocks nothing                                    |
 
 By Google's default, all categories are set to `BLOCK_SOME`. Google [also states](https://ai.google.dev/gemini-api/docs/safety-settings) that "Adjusting to lower safety settings will trigger a more indepth review process of your application."
+
+#### How to set a specific output JSON Schema
+
+Google allows you to force Gemini to reply in a specific JSON schema. Note that Gemini AI requires you to manually `JSON.parse()` this output.
+
+The following examples entail generating cookie recipies with Gemini returning an array of objects, each with a `recipe_name` field.
+
+This feature can be enabled simply by setting the `jsonSchema` config to `true`. It is ideal that you specify how you want the JSON to be shaped in your prompt, but it is not necessary.
+
+```javascript
+await gemini.ask(
+	"List 5 popular cookie recipes. Give them as an array of objects, each with a recipe_name field.",
+	{
+		jsonSchema: true,
+	}
+);
+```
+
+However, you can also set a specific JSON schema with code. Pass in a JSON schema object as follows into `jsonSchema`:
+
+```javascript
+await gemini.ask(
+	"List 5 popular cookie recipes. Give them as an array of objects, each with a recipe_name field.",
+	{
+		jsonSchema: {
+			type: Gemini.SchemaType.ARRAY,
+			items: {
+				type: Gemini.SchemaType.OBJECT,
+				properties: {
+					recipe_name: {
+						type: Gemini.SchemaType.STRING,
+					},
+				},
+			},
+		},
+	}
+);
+```
+
+The available types are `ARRAY`, `OBJECT`, `STRING`, `NUMBER`, `INTEGER`, `BOOLEAN`, accessible in the `Gemini.SchemaType` enum. Learn more about this syntax at [Google's documentation](https://ai.google.dev/gemini-api/docs/api-overview#json).
+
+> [!NOTE]
+> When you pass in this schema object into `gemini-1.5-flash-latest`, it will be directly included as text after your prompt, wrapped in `<JSONSchema>` tags. However, with `gemini-1.5-pro-latest`, Gemini utilizes controlled generation/constrained decoding to force the output to be in your JSON schema. In other words, Gemini 1.5 Flash should be able to reasonably infer what you want to do, but in the cases where it still deviates from your schema, use Gemini 1.5 Pro to force it.
 
 ### `Gemini.count()`
 

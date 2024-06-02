@@ -522,7 +522,7 @@ console.log(await gemini.embed("Hello!"));
 
 ### `Gemini.createChat()`
 
-`Gemini.createChat()` is a unique method. For one, it isn't asynchronously called. Additionally, it returns a brand new `Chat` object. The `Chat` object only has one method, which is `Chat.ask()`, which has the _exact same syntax_ as the `Gemini.ask()` method, documented [above](#geminiask). The only small difference is that most parameters are passed into the `Chat` through `createChat()`, and cannot be overriden by the `ask()` method. The only parameters that can be overridden is `format`, `stream`, and `data`.
+`Gemini.createChat()` is a unique method. For one, it isn't asynchronously called. Additionally, it returns a brand new `Chat` object. The `Chat` object only has one method, which is `Chat.ask()`, which has the _exact same syntax_ as the `Gemini.ask()` method, documented [above](#geminiask). The only small difference is that most parameters are passed into the `Chat` through `createChat()`, and cannot be overriden by the `ask()` method. The only parameters that can be overridden is `format`, `stream`, `data`, and `jsonSchema`.
 
 All important data in the `Chat` object is stored in the `Chat.messages` variable, and can be used to create a new `Chat` that "continues" the conversation, as will be demoed in the example usage section.
 
@@ -535,6 +535,7 @@ Config available for `createChat`:
 | `model` | `gemini-1.5-flash-latest` |
 | `maxOutputTokens` | Max tokens to output | `2048` |
 | `messages` | Array of `[userInput, modelOutput]` pairs to show how the bot is supposed to behave (or to continue a conversation), or a array of type `Message[]`, so you can directly input a previous `chat.messages` | `[]` |
+| `systemInstruction` | Instruct what the model should act like (i.e. a persona, output format, style/tone, goals/rules, and additional context) | `""` |
 
 Example Usage:
 

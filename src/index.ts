@@ -396,7 +396,10 @@ class Gemini {
 			const messageParts = [message, parsedOptions.data].flat();
 			const parts = await messageToParts(messageParts, this);
 
-			if (parsedOptions.jsonSchema) {
+			if (
+				parsedOptions.jsonSchema &&
+				parsedOptions.model !== "gemini-1.5-pro-latest"
+			) {
 				parts.push({
 					text: `Use this JSON schema: <JSONSchema>${JSON.stringify(
 						parsedOptions.jsonSchema,
@@ -420,6 +423,11 @@ class Gemini {
 				responseMimeType: parsedOptions.jsonSchema
 					? "application/json"
 					: undefined,
+				responseSchema:
+					typeof parsedOptions.jsonSchema === "object" &&
+					parsedOptions.model === "gemini-1.5-pro-latest"
+						? parsedOptions.jsonSchema
+						: undefined,
 			},
 			safetySettings,
 		};

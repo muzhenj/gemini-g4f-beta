@@ -2,13 +2,14 @@
 	"name": "gemini-ai",
 	"version": "2.2.0",
 	"author": "EvanZhouDev",
+	"contributors": ["XInTheDark"],
 	"description": "The simpler JavaScript Gemini SDK",
 	"license": "GPL-3.0",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/EvanZhouDev/gemini-ai.git"
+		"url": "git+https://github.com/XInTheDark/gemini-ai.git"
 	},
-	"homepage": "https://github.com/EvanZhouDev/gemini-ai",
+	"homepage": "https://github.com/XInTheDark/gemini-ai",
 	"scripts": {
 		"build": "tsup",
 		"test": "vitest",

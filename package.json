@@ -1,7 +1,7 @@
 {
   "name": "gemini-ai-g4f",
   "version": "12.2.0",
-  "author": "XInTheDark",
+  "author": "jmuzhen",
   "contributors": [
     "EvanZhouDev"
   ],
@@ -9,9 +9,9 @@
   "license": "GPL-3.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jmuzhen/gemini-ai-beta.git"
+    "url": "git+https://github.com/XInTheDark/gemini-ai.git"
   },
-  "homepage": "https://github.com/jmuzhen/gemini-ai-beta",
+  "homepage": "https://github.com/XInTheDark/gemini-ai",
   "scripts": {
     "build": "tsup",
     "test": "vitest",

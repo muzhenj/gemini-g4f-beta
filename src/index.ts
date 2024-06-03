@@ -332,7 +332,7 @@ class Gemini {
 
 	async ask<F extends Format = typeof Gemini.TEXT>(
 		message: string | (string | Uint8Array | ArrayBuffer)[] | Message,
-		options: Partial<CommandOptionMap<F>[Command.Generate]> = {}, stop: AbortSignal = null,
+		options: Partial<CommandOptionMap<F>[Command.Generate]> = {}, stop_signal: AbortSignal = null,
 	): Promise<CommandResponseMap<F>[Command.Generate]> {
 		const parsedOptions: CommandOptionMap<F>[Command.Generate] = {
 			...{
@@ -445,7 +445,7 @@ class Gemini {
 			parsedOptions.model,
 			command,
 			body,
-			stop,
+			stop_signal,
 		);
 
 		if (parsedOptions.stream) {
@@ -497,6 +497,7 @@ class Chat {
 	async ask<F extends Format = typeof Gemini.TEXT>(
 		message: string | (string | Uint8Array | ArrayBuffer)[] | Message,
 		options: Partial<ChatAskOptions<F>> = {},
+		stop_signal: AbortSignal = null,
 	): Promise<CommandResponseMap<F>[Command.Generate]> {
 		const parsedConfig: CommandOptionMap<F>[Command.Generate] = {
 			...this.options,
@@ -545,7 +546,7 @@ class Chat {
 								: (res.candidates[0].content.parts[0].text as FormatType<F>),
 						)
 				: undefined,
-		});
+		}, stop_signal);
 
 		this.messages.push(parsedMessage);
 		this.messages.push({

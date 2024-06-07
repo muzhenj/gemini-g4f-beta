@@ -287,6 +287,10 @@ class Gemini {
 	private switchFormat =
 		<F extends Format>(format: F = Gemini.TEXT as F) =>
 		(response: GeminiResponse): FormatType<F> => {
+			if (response.candidates.length === 0) {
+				throw new Error("No candidates found in response");
+			}
+
 			if (response.candidates[0].finishReason === "SAFETY") {
 				throw new SafetyError(
 					`Your prompt was blocked by Google. Here are the Harm Categories: \n${JSON.stringify(
